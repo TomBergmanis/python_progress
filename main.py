@@ -70,7 +70,7 @@ def main():
 
         coding_data.append({
             "Index": len(coding_data) + 1,  # Add an index starting from 1
-            "Date": specific_date.strftime("%a %d/%m/%y"),
+            "Date": specific_date.strftime("%d/%m/%y"),
             "Day": day,
             "Total Hours": hours
         })
@@ -114,72 +114,26 @@ if __name__ == "__main__":
 # The next step is to plot this data to a graph that updates itself each time the user logs/inputs new data/ hours learning
 # The graph should plot the goal hours and the time actually spent learning to code. 
 
-# # from datetime import datetime
-# import matplotlib.pyplot as plt
-# import numpy as np
-# from matplotlib import style 
 
-# import calendar 
+from datetime import datetime
+import matplotlib.pyplot as plt
+import pandas as pd 
+import numpy as np
+from matplotlib import style 
 
-# style.use('ggplot')
+style.use('fivethirtyeight')
 
-# # Calendar 
-# def display_calendar(year, month):
-#     # Generate a calendar for the specified year and month
-#     cal = calendar.monthcalendar(year, month)
+df = pd.read_csv('total_tracked_coding_hours.csv', parse_dates=['Date'], dayfirst=True)
 
-#     # Define the days of the week
-#     weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+df.set_index("Date", inplace=True)
 
-#     # Display the header
-#     print(f"{' '.join(weekdays)}")
+plt.bar(df.index, df['Total Hours'])
+plt.xticks(df.index, rotation=45)
+plt.xlabel('Date')
+plt.ylabel('Total Hours')
+plt.title('Total Time Coding')
 
-#     # Display each week in the calendar
-#     for week in cal:
-#         week_str = " ".join(str(day) if day != 0 else "  " for day in week)
-#         print(week_str)
+plt.subplots_adjust(left=0.083, bottom=0.212,right=0.94, top=0.936, wspace=0.2, hspace=0)
 
-# if __name__ == "__main__":
-#     # Get user input for the year and month
-#     year = int(input("Enter the year: "))
-#     month = int(input("Enter the month (1-12): "))
+plt.show()
 
-#     # Display the calendar
-#     display_calendar(year, month)
-
-# # Todays Date
-# def get_todays_date():
-#     current_datetime = datetime.now()
-#     formatted_date = current_datetime.strftime('%d/%m/%Y %A')
-#     return formatted_date
-
-# if __name__ == "__main__":
-#     formatted_date = get_todays_date()
-#     print("Today's date: ", formatted_date)
-
-#     # Daily goal setter
-#     daily_goal = float(input("How many hours a day are you going to code? "))
-
-#     # y = daily_goal
-
-#     # Ask the user for daily learning hours
-#     user_daily_hours = float(input("How many hours did you spend learning to code today? "))
-
-#     # y2 = user_daily_hours
-
-#     # x = ['Mon','Tues','Wed','Thu','Fri','Sat','Sun']
-#     # plt.bar(x, y, label='Goal', color='r')
-#     # plt.bar(x, y2, label='Learning', color='b')
-
-#     # plt.show()
-
-#     # Example: Display daily progress and goal
-#     daily_progress = min(user_daily_hours, daily_goal)
-#     print(f"Today's Progress: {daily_progress}/{daily_goal} hours")
-
-#     # Example: Display health bar visualization
-#     progress_bar = "#" * int((daily_progress) * 10)
-#     print("Progress Bar:", progress_bar)
-
-
-# # user_daily_hours = int(input("How many hours this week are you planning on learning to code? "))

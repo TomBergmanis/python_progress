@@ -8,17 +8,18 @@ import pandas as pd
 import numpy as np
 from matplotlib import style 
 
-style.use('ggplot')
+style.use('fivethirtyeight')
 
+df = pd.read_csv('total_tracked_coding_hours.csv', parse_dates=['Date'], dayfirst=True)
 
-df = pd.read_csv('total_tracked_coding_hours.csv')
+df.set_index("Date", inplace=True)
 
+plt.plot(df.index, df['Total Hours'])
+plt.xticks(df.index, rotation=45)
+plt.xlabel('Date')
+plt.ylabel('Total Hours')
+plt.title('Total Tracker Coding Hours Over Time')
 
+plt.subplots_adjust(left=0.083, bottom=0.212,right=0.94, top=0.936, wspace=0.2, hspace=0)
 
-# plt.plot(x,y, label='First line')
-# plt.plot(x2,y2, label='Second line')
-# plt.xlabel('Plot Number')
-# plt.ylabel('Important var')
-# plt.title('Interesting Graph\n Check it out')
-# plt.legend()
-# plt.show()
+plt.show()
