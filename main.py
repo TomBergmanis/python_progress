@@ -33,8 +33,14 @@ could add a stop watch timer that records how long you are coding for. this coul
 
 """
 
-import datetime
 import csv
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import pandas as pd 
+import numpy as np
+from matplotlib import style 
+
+style.use('ggplot')
 
 # This section gets the user to input their time spent learning to code during the week and then saves it to a CSV file for later
 
@@ -43,6 +49,7 @@ def main():
     coding_data = []
     days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+    global goal_setting
     goal_setting = float(input("What is your goal for how many hours you plan to spend learning to code this week: "))
 
     # Input coding hours for each day
@@ -58,10 +65,10 @@ def main():
                 print("Please enter a valid number.")
 
         # Calculate the date for the specific day entered
-        current_date = datetime.datetime.now()
+        current_date = datetime.now()
         day_of_week = days_of_week.index(day)
         delta_days = (current_date.weekday() - day_of_week) % 7
-        specific_date = current_date - datetime.timedelta(days=delta_days)
+        specific_date = current_date - timedelta(days=delta_days)
 
         # Check if the calculated date is in the future
         if specific_date > current_date:
@@ -69,7 +76,7 @@ def main():
             continue
 
         coding_data.append({
-            "Index": len(coding_data) + 1,  # Add an index starting from 1
+            "Index": len(coding_data),  # Add an index starting from 0
             "Date": specific_date.strftime("%d/%m/%y"),
             "Day": day,
             "Total Hours": hours
@@ -107,33 +114,92 @@ def main():
 
     print(f"\nCoding hours data saved to {csv_filename}.")
 
-if __name__ == "__main__":
-    main()
-
 # The user has now entered the data and it is now saved to a CSV
 # The next step is to plot this data to a graph that updates itself each time the user logs/inputs new data/ hours learning
 # The graph should plot the goal hours and the time actually spent learning to code. 
 
+# Shows the amount of time in a week spent learning to code
+def plot_weekly_summary(df):
+  
+    fig, axis = plt.subplots(1,1)
 
-from datetime import datetime
-import matplotlib.pyplot as plt
-import pandas as pd 
-import numpy as np
-from matplotlib import style 
+    # Set the width of each bar
+    bar_width = 0.35
 
-style.use('fivethirtyeight')
+    # Set the position of bars on X-axis
+    bar_positions_actual = np.arange(len(df.index))
+    bar_positions_goal = bar_positions_actual + bar_width
 
-df = pd.read_csv('total_tracked_coding_hours.csv', parse_dates=['Date'], dayfirst=True)
+    # Plotting the actual time spent learning
+    axis.bar(bar_positions_actual, df['Total Hours'], label='Actual Time', width=bar_width, color='green', alpha=0.9)
 
-df.set_index("Date", inplace=True)
+    # Plotting the goal time for each day
+    goal_hours = [goal_setting / 7] * len(df.index)
+    axis.bar(bar_positions_goal, goal_hours, label='Goal Time', width=bar_width, color='orange', alpha=0.6)
 
-plt.bar(df.index, df['Total Hours'])
-plt.xticks(df.index, rotation=45)
-plt.xlabel('Date')
-plt.ylabel('Total Hours')
-plt.title('Total Time Coding')
+    set_date = df.index.strftime('%d/%m/%y\n%A')
 
-plt.subplots_adjust(left=0.083, bottom=0.212,right=0.94, top=0.936, wspace=0.2, hspace=0)
+    plt.xticks((bar_positions_actual + bar_positions_goal) / 2, set_date, rotation=45)
+    plt.xlabel('Date')
+    plt.ylabel('Hours')
+    plt.title('Coding Hours vs. Goal Hours')
+    # Adding a legend to differentiate between Actual Time and Goal Time
+    plt.legend()
+    plt.subplots_adjust(left=0.083, bottom=0.238, right=0.94, top=0.936, wspace=0.2, hspace=0)
 
-plt.show()
+    # plt.show()
+
+# Monthly Tracker done by week 
+    
+# def plot_monthly_summary(df):
+#     df['Week'] = df.index.strftime('%U')
+#     weekly_summary = df.groupby(['Month', 'Week'])['Total Hours'].sum()
+
+#     fig, axis = plt.subplots(1,1)   
+#     bar_positions = np.arange(len(weekly_summary))
+
+#     axis.bar(bar_positions, weekly_summary, color='purple', alpha=0.7)
+
+#     # Use multi-level labels for better readability
+#     labels = [f'Month {month}, Week {week}' for (month, week) in weekly_summary.index]
+#     plt.xticks(bar_positions, labels, rotation=45, ha='right')
+
+#     plt.xlabel('Weekly Breakdown')
+#     plt.ylabel('Hours')
+#     plt.title('Monthly Coding Hours Summary')
+
+#     plt.show()
+
+
+# Yearly tracker done by the week 
+    
+# def plot_yearly_summary(df):
+#     df['Week'] = df.index.strftime('%U')
+#     weekly_summary = df.groupby('Week')['Total Hours'].sum()
+
+#     fig, axis = plt.subplots(1,1)
+#     bar_positions = np.arange(len(weekly_summary))
+
+#     axis.bar(bar_positions, weekly_summary, color='green', alpha=0.7)
+
+#     plt.xlabel('Week')
+#     plt.ylabel('Hours')
+#     plt.title('Yearly Coding Hours Summary')
+
+#     plt.show()
+
+if __name__ == "__main__":
+    main()
+
+    # Reloads the CSV file to include the new data
+    df = pd.read_csv('total_tracked_coding_hours.csv', parse_dates=['Date'], dayfirst=True)
+    df.set_index("Date", inplace=True)
+
+    plot_weekly_summary(df)
+
+    # plot_monthly_summary(df)
+
+    # plot_yearly_summary(df)
+
+
 
